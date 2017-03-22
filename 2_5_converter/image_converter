@@ -1,0 +1,11 @@
+import os
+import subprocess
+
+source_dir = 'Source'
+result_dir = 'Result'
+os.makedirs(result_dir, exist_ok=True)
+
+for filename in os.listdir(source_dir):
+    args = ['convert', os.path.join(source_dir, filename), '-resize', '200', os.path.join(result_dir, filename)]
+    sub_pr = subprocess.Popen(args)
+    print(filename, 'converted')
