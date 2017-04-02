@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 import pprint
 #import vk
+# import Plotly
 
 AUTHORISE_URL = 'https://oauth.vk.com/authorize'
 VERSION = '5.62'
@@ -27,23 +28,26 @@ print('?'.join((AUTHORISE_URL, urlencode(auth_data))))
 token_url = 'https://oauth.vk.com/blank.html#access_token=16124c69865ccab515ec419b8188abe3fa2935b49ebec1ba8b2799f43dd67a3b4092359861cc0c430c370&expires_in=86400&user_id=25359024'
 
 params = {
-    'access_token': '9f9445f905e0df13608d8d4cdd2aa5ac9281c9b5540cbb38aaefc64ffa537a5a4aaedddff371a86b80fa8',
+    'access_token': 'aff67612cb83dc52c1076fb241d4aa580101cfddde3689e8f7469d2ff98a0a797383f35b09705b56f7d65',
     'v': VERSION
 }
 
 params['user_id'] = 196269662
 params['fields'] = 'last_name'
 
-my_friends = requests.get('https://api.vk.com/method/friends.get', params)
-pprint.pprint(my_friends.json())
+response = requests.get('https://api.vk.com/method/friends.get', params)
+my_friends = response.json()['response']['items']
+pprint.pprint(my_friends)
 
 overall_friends = []
 friend_data = dict()
 #overall_friends.append(params['user_id'])
 
 def get_friends_vk(my_friends, overall_friends):
-    for friend in my_friends.json()['response']['items']:
+    #проходим по списку друзей
+    for friend in my_friends:
         try:
+            overall_friends.append(friend)
             print('----------------------------------')
             print('Друзья', friend['first_name'], friend['last_name'], friend['id'])
             #добавить друга в список
@@ -58,9 +62,10 @@ def get_friends_vk(my_friends, overall_friends):
             #    print('fr', fr)
             #    overall_friends.append(fr['id'])
             #    friend_data['items'] = fr
-            friend_data['items'] = fr_of_friends.json()['response']['items']
+            #friend_data['items'] = fr_of_friends.json()['response']['items']
+           # overall_friends.append(fr_of_friends.json()['response']['items'])
             ##print(friend_data)
-            overall_friends.append(friend_data)
+            overall_friends.extend(fr_of_friends.json()['response']['items'])
         except KeyError:
             continue
         except TypeError:
@@ -84,8 +89,8 @@ def add_grapth_edges(data):
 
 get_friends_vk(my_friends, overall_friends)
 
-print(overall_friends)
-
+#print(overall_friends)
+#set_fr = set(overall_friends)
 add_grapth_edges(overall_friends)
 
 nx.draw_networkx(G)
